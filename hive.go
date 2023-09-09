@@ -3,8 +3,8 @@ package main
 import (
 	"flag"
 	"fmt"
-	"hive/check"
-	"hive/tidy"
+	"hive/packages/check"
+	"hive/packages/tidy"
 	"os"
 )
 
