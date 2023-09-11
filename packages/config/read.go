@@ -6,15 +6,15 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-func ReadModules(path string) (Modules, error) {
+func ReadConfig(path string) (*Config, error) {
 	buffer, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
 
-	modules := Modules{}
-	if err = yaml.Unmarshal(buffer, modules); err != nil {
+	config := &Config{}
+	if err = yaml.Unmarshal(buffer, config); err != nil {
 		return nil, err
 	}
-	return modules, err
+	return config, err
 }
