@@ -9,18 +9,7 @@ import (
 	"path/filepath"
 )
 
-const basePath = ".devtools/hive"
-const modulesPath = basePath + "/modules"
-const localModulesPath = modulesPath + "/local.yml"
-const remoteModulesPath = modulesPath + "/remote.yml"
-const rulesPath = basePath + "/rules.yml"
-
-var types = []string{"base", "feature"}
-var bans = []config.Ban{
-	{ModuleType: "feature", DependencyType: "feature", Severity: "error"},
-	{ModuleType: "base", DependencyType: "feature", Severity: "error"},
-	{ModuleType: "base", DependencyType: "base", Severity: "warning"},
-}
+const configPath = ".devtools/hive.yml"
 
 func Tidy() error {
 	remotePods, localPods, err := readPods()
@@ -28,15 +17,20 @@ func Tidy() error {
 		return err
 	}
 
-	if err = updateModules(remotePods, remoteModulesPath); err != nil {
+	var config config.Config
+	configPtr, err := readConfig(configPath)
+	if err != nil {
 		return err
 	}
-	if err = updateModules(localPods, localModulesPath); err != nil {
+	config = *configPtr
+
+	updateModules(remotePods, &config.Modules.Remote)
+	updateModules(localPods, &config.Modules.Local)
+
+	if err := writeConfig(config, configPath); err != nil {
 		return err
 	}
-	if err = writeRules(types, bans, rulesPath); err != nil {
-		return err
-	}
+
 	return nil
 }
 
@@ -57,32 +51,47 @@ func readPods() (
 	return cocoapods.ParsePodfile(paths[0])
 }
 
+func readConfig(path string) (*config.Config, error) {
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		return &config.Config{
+			Types: []string{"base", "feature"},
+			Bans: []map[string]string{
+				{"feature": "feature", "severity": "error"},
+				{"base": "feature", "severity": "error"},
+				{"base": "base", "severity": "warning"},
+			},
+			Modules: config.Modules{
+				Remote: map[string]*string{},
+				Local:  map[string]*string{},
+			},
+		}, nil
+	}
+	return config.ReadConfig(path)
+}
+
 func updateModules(
 	pods map[string]cocoapods.Pod,
-	path string,
-) error {
+	modules *map[string]*string,
+) {
+	for module := range *modules {
+		if _, ok := pods[module]; !ok {
+			delete(*modules, module)
+		}
+	}
+	for _, pod := range pods {
+		if _, ok := (*modules)[pod.Name]; !ok {
+			(*modules)[pod.Name] = nil
+		}
+	}
+}
+
+func writeConfig(config config.Config, path string) error {
 	directoryPath := filepath.Dir(path)
 	if _, err := os.Stat(directoryPath); os.IsNotExist(err) {
 		if err := os.MkdirAll(directoryPath, os.ModePerm); err != nil {
 			return err
 		}
 	}
-
-	modules, err := config.ReadModules(path)
-	if err != nil {
-		return err
-	}
-	for _, pod := range pods {
-		if _, ok := modules[pod.Name]; !ok {
-			modules[pod.Name] = nil
-		}
-	}
-	return config.WriteModules(modules, path)
-}
-
-func writeRules(types []string, bans []config.Ban, path string) error {
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		return config.WriteRules(types, bans, path)
-	}
+	config.WriteConfig(path)
 	return nil
 }
