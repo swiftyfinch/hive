@@ -86,29 +86,52 @@ func parsePods(anyPods []interface{}) (map[string]Pod, error) {
 					return nil, err
 				}
 
-				anyDependenciesSlice, ok := anyDependencies.([]interface{})
-				if !ok {
-					return nil, fmt.Errorf("incorrect type of pod dependencies")
-				}
-
-				dependencies := []string{}
-				for _, anyDependency := range anyDependenciesSlice {
-					dependency, ok := anyDependency.(string)
-					if !ok {
-						return nil, fmt.Errorf("incorrect type of pod dependency")
-					}
-
-					name, _, err := parsePod(dependency)
-					if err != nil {
-						return nil, err
-					}
-					dependencies = append(dependencies, name)
+				dependencies, err := parseDependencies(anyDependencies)
+				if err != nil {
+					return nil, err
 				}
 				pods[name] = Pod{name, dependencies}
 			}
+		case map[string]interface{}:
+			for line, anyDependencies := range pod {
+				name, _, err := parsePod(line)
+				if err != nil {
+					return nil, err
+				}
+
+				dependencies, err := parseDependencies(anyDependencies)
+				if err != nil {
+					return nil, err
+				}
+				pods[name] = Pod{name, dependencies}
+			}
+		default:
+			return nil, fmt.Errorf("unkown type of pods")
 		}
 	}
 	return pods, nil
+}
+
+func parseDependencies(anyDependencies interface{}) ([]string, error) {
+	anyDependenciesSlice, ok := anyDependencies.([]interface{})
+	if !ok {
+		return nil, fmt.Errorf("incorrect type of pod dependencies")
+	}
+
+	dependencies := []string{}
+	for _, anyDependency := range anyDependenciesSlice {
+		dependency, ok := anyDependency.(string)
+		if !ok {
+			return nil, fmt.Errorf("incorrect type of pod dependency")
+		}
+
+		name, _, err := parsePod(dependency)
+		if err != nil {
+			return nil, err
+		}
+		dependencies = append(dependencies, name)
+	}
+	return dependencies, nil
 }
 
 func parsePod(line string) (string, string, error) {
