@@ -12,22 +12,24 @@ import (
 const configPath = ".devtools/hive.yml"
 
 func Tidy() error {
+	// Read pods from Podfile.lock
 	remotePods, localPods, err := readPods()
 	if err != nil {
 		return err
 	}
 
-	var config config.Config
-	configPtr, err := readConfig(configPath)
+	// Read config
+	config, err := readConfig(configPath)
 	if err != nil {
 		return err
 	}
-	config = *configPtr
 
+	// Merge modules from Podfile.lock and hive.yml
 	updateModules(remotePods, &config.Modules.Remote)
 	updateModules(localPods, &config.Modules.Local)
 
-	if err := writeConfig(config, configPath); err != nil {
+	// Write config
+	if err := writeConfig(*config, configPath); err != nil {
 		return err
 	}
 
