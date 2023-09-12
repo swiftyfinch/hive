@@ -24,6 +24,11 @@ func Tidy() error {
 		return err
 	}
 
+	// Validate Config
+	if err := config.Validate(); err != nil {
+		return err
+	}
+
 	// Merge modules from Podfile.lock and hive.yml
 	updateModules(remotePods, &config.Modules.Remote)
 	updateModules(localPods, &config.Modules.Local)
