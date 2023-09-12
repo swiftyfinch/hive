@@ -12,33 +12,26 @@ import (
 const configPath = ".devtools/hive.yml"
 
 func Tidy() error {
+	config, err := readConfig(configPath)
+	if err != nil {
+		return err
+	}
+	if err := config.Validate(); err != nil {
+		return err
+	}
+
 	// Read pods from Podfile.lock
 	remotePods, localPods, err := readPods()
 	if err != nil {
 		return err
 	}
 
-	// Read config
-	config, err := readConfig(configPath)
-	if err != nil {
-		return err
-	}
-
-	// Validate Config
-	if err := config.Validate(); err != nil {
-		return err
-	}
-
-	// Merge modules from Podfile.lock and hive.yml
+	// Merge modules from Podfile.lock and config
 	updateModules(remotePods, &config.Modules.Remote)
 	updateModules(localPods, &config.Modules.Local)
 
-	// Write config
-	if err := writeConfig(*config, configPath); err != nil {
-		return err
-	}
-
-	return nil
+	// Save updated config
+	return writeConfig(*config, configPath)
 }
 
 func readPods() (
