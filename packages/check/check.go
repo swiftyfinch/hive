@@ -2,7 +2,7 @@ package check
 
 import "fmt"
 
-func Check() {
+func Check(configPath string) {
 	fmt.Println("Check")
 
 	// TODO:

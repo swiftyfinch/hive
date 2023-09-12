@@ -9,9 +9,7 @@ import (
 	"path/filepath"
 )
 
-const configPath = ".devtools/hive.yml"
-
-func Tidy() error {
+func Tidy(configPath string) error {
 	config, err := readConfig(configPath)
 	if err != nil {
 		return err

@@ -9,6 +9,8 @@ import (
 	"os"
 )
 
+const configPath = ".devtools/hive.yml"
+
 func main() {
 	if len(os.Args) < 2 {
 		fmt.Println("missing subcommand")
@@ -19,11 +21,11 @@ func main() {
 	case "check":
 		checkFlagSet := flag.NewFlagSet("check", flag.ExitOnError)
 		checkFlagSet.Parse(os.Args[2:])
-		check.Check()
+		check.Check(configPath)
 	case "tidy":
 		tidyFlagSet := flag.NewFlagSet("tidy", flag.ExitOnError)
 		tidyFlagSet.Parse(os.Args[2:])
-		if err := tidy.Tidy(); err != nil {
+		if err := tidy.Tidy(configPath); err != nil {
 			log.Fatal(err)
 		}
 	default:
