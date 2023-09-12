@@ -94,6 +94,6 @@ func writeConfig(config config.Config, path string) error {
 			return err
 		}
 	}
-	config.WriteConfig(path)
+	config.Write(path)
 	return nil
 }

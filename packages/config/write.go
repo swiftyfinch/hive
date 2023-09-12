@@ -7,7 +7,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-func (config Config) WriteConfig(path string) error {
+func (config Config) Write(path string) error {
 	return writeYMLFile(config, path)
 }
 
