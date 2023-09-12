@@ -6,7 +6,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-func ReadConfig(path string) (*Config, error) {
+func Read(path string) (*Config, error) {
 	buffer, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err

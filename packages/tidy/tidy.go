@@ -68,7 +68,7 @@ func readConfig(path string) (*config.Config, error) {
 			},
 		}, nil
 	}
-	return config.ReadConfig(path)
+	return config.Read(path)
 }
 
 func updateModules(
