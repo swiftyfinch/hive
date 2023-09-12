@@ -1,10 +1,8 @@
 package tidy
 
 import (
-	"fmt"
 	"hive/packages/cocoapods"
 	"hive/packages/config"
-	glob "hive/packages/utils"
 	"os"
 	"path/filepath"
 )
@@ -19,7 +17,7 @@ func Tidy(configPath string) error {
 	}
 
 	// Read pods from Podfile.lock
-	remotePods, localPods, err := readPods()
+	remotePods, localPods, err := cocoapods.ReadPods()
 	if err != nil {
 		return err
 	}
@@ -30,23 +28,6 @@ func Tidy(configPath string) error {
 
 	// Save updated config
 	return writeConfig(*config, configPath)
-}
-
-func readPods() (
-	remotePods map[string]cocoapods.Pod,
-	localPods map[string]cocoapods.Pod,
-	err error,
-) {
-	paths, err := glob.FindPathsRecursively(".", "Podfile.lock")
-	if err != nil {
-		return nil, nil, err
-	}
-	if len(paths) == 0 {
-		return nil, nil, fmt.Errorf("couldn't find any Podfile.lock")
-	} else if len(paths) > 1 {
-		return nil, nil, fmt.Errorf("found several Podfile.lock files")
-	}
-	return cocoapods.ParsePodfile(paths[0])
 }
 
 func readConfig(path string) (*config.Config, error) {

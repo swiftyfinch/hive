@@ -9,6 +9,11 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+type Pod struct {
+	Name         string
+	Dependencies []string
+}
+
 type podfile struct {
 	Pods            []interface{}          `yaml:"PODS"`
 	SpecRepos       map[string][]string    `yaml:"SPEC REPOS"`
@@ -58,11 +63,6 @@ func ParsePodfile(path string) (
 	}
 
 	return remotePods, localPods, nil
-}
-
-type Pod struct {
-	Name         string
-	Dependencies []string
 }
 
 func parsePods(anyPods []interface{}) (map[string]Pod, error) {
