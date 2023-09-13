@@ -2,17 +2,13 @@ package cocoapods
 
 import (
 	"fmt"
+	"hive/packages/common"
 	"os"
 	"regexp"
 	"strings"
 
 	"gopkg.in/yaml.v3"
 )
-
-type Pod struct {
-	Name         string
-	Dependencies []string
-}
 
 type podfile struct {
 	Pods            []interface{}          `yaml:"PODS"`
@@ -21,8 +17,8 @@ type podfile struct {
 }
 
 func ParsePodfile(path string) (
-	remotePods map[string]Pod,
-	localPods map[string]Pod,
+	remotePods map[string]common.Module,
+	localPods map[string]common.Module,
 	err error,
 ) {
 	buffer, err := os.ReadFile(path)
@@ -51,8 +47,8 @@ func ParsePodfile(path string) (
 		remotePodNames[name] = void{}
 	}
 
-	localPods = map[string]Pod{}
-	remotePods = map[string]Pod{}
+	localPods = map[string]common.Module{}
+	remotePods = map[string]common.Module{}
 	for _, pod := range pods {
 		podName := strings.Split(pod.Name, "/")[0]
 		if _, ok := remotePodNames[podName]; ok {
@@ -65,8 +61,8 @@ func ParsePodfile(path string) (
 	return remotePods, localPods, nil
 }
 
-func parsePods(anyPods []interface{}) (map[string]Pod, error) {
-	pods := map[string]Pod{}
+func parsePods(anyPods []interface{}) (map[string]common.Module, error) {
+	pods := map[string]common.Module{}
 	for _, any := range anyPods {
 		switch pod := any.(type) {
 		case string:
@@ -74,7 +70,7 @@ func parsePods(anyPods []interface{}) (map[string]Pod, error) {
 			if err != nil {
 				return nil, err
 			}
-			pods[name] = Pod{name, []string{}}
+			pods[name] = common.Module{Name: name, Dependencies: []string{}}
 		case map[interface{}]interface{}:
 			for anyName, anyDependencies := range pod {
 				line, ok := anyName.(string)
@@ -90,7 +86,7 @@ func parsePods(anyPods []interface{}) (map[string]Pod, error) {
 				if err != nil {
 					return nil, err
 				}
-				pods[name] = Pod{name, dependencies}
+				pods[name] = common.Module{Name: name, Dependencies: dependencies}
 			}
 		case map[string]interface{}:
 			for line, anyDependencies := range pod {
@@ -103,7 +99,7 @@ func parsePods(anyPods []interface{}) (map[string]Pod, error) {
 				if err != nil {
 					return nil, err
 				}
-				pods[name] = Pod{name, dependencies}
+				pods[name] = common.Module{Name: name, Dependencies: dependencies}
 			}
 		default:
 			return nil, fmt.Errorf("unkown type of pods")

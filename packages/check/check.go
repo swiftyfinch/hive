@@ -3,6 +3,7 @@ package check
 import (
 	"fmt"
 	"hive/packages/cocoapods"
+	"hive/packages/common"
 	"hive/packages/config"
 )
 
@@ -48,7 +49,7 @@ type validationFailure struct {
 }
 
 func checkDependencies(
-	modules map[string]cocoapods.Pod,
+	modules map[string]common.Module,
 	bans []map[string]string,
 	moduleTypes map[string]string,
 ) ([]validationFailure, error) {

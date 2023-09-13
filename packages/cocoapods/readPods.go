@@ -2,12 +2,13 @@ package cocoapods
 
 import (
 	"fmt"
+	"hive/packages/common"
 	glob "hive/packages/utils"
 )
 
 func ReadPods() (
-	remotePods map[string]Pod,
-	localPods map[string]Pod,
+	remotePods map[string]common.Module,
+	localPods map[string]common.Module,
 	err error,
 ) {
 	paths, err := glob.FindPathsRecursively(".", "Podfile.lock")

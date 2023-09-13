@@ -2,6 +2,7 @@ package tidy
 
 import (
 	"hive/packages/cocoapods"
+	"hive/packages/common"
 	"hive/packages/config"
 	"os"
 	"path/filepath"
@@ -49,7 +50,7 @@ func readConfig(path string) (*config.Config, error) {
 }
 
 func updateModules(
-	pods map[string]cocoapods.Pod,
+	pods map[string]common.Module,
 	modules *map[string]*string,
 ) {
 	for module := range *modules {
