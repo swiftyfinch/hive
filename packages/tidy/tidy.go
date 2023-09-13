@@ -6,6 +6,7 @@ import (
 	"hive/packages/config"
 	"os"
 	"path/filepath"
+	"regexp"
 )
 
 func Tidy(configPath string) error {
@@ -24,8 +25,8 @@ func Tidy(configPath string) error {
 	}
 
 	// Merge modules from Podfile.lock and config
-	updateModules(remoteModules, &config.Modules.Remote)
-	updateModules(localModules, &config.Modules.Local)
+	updateModules(remoteModules, &config.Modules.Remote, config.Types)
+	updateModules(localModules, &config.Modules.Local, config.Types)
 
 	// Save updated config
 	return writeConfig(*config, configPath)
@@ -57,17 +58,33 @@ func readConfig(path string) (*config.Config, error) {
 func updateModules(
 	modules map[string]common.Module,
 	configModules *map[string]*string,
-) {
+	types []interface{},
+) error {
 	for module := range *configModules {
 		if _, ok := modules[module]; !ok {
 			delete(*configModules, module)
 		}
 	}
+
 	for _, module := range modules {
+		for _, element := range types {
+			if regex := config.TypeRegex(element); regex != nil {
+				regex, err := regexp.Compile(*regex)
+				if err != nil {
+					return err
+				}
+				if regex.MatchString(module.Name) {
+					(*configModules)[module.Name] = config.TypeValue(element)
+					break
+				}
+			}
+		}
+
 		if _, ok := (*configModules)[module.Name]; !ok {
 			(*configModules)[module.Name] = nil
 		}
 	}
+	return nil
 }
 
 func writeConfig(config config.Config, path string) error {
