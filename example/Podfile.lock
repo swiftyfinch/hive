@@ -5,8 +5,9 @@ PODS:
   - Kingfisher (7.4.1)
   - LocalPod (1.0.0):
     - Moya/Core
+    - SnapKit
   - LocalPod/Tests (1.0.0):
-    - Moya/Core
+    - Alamofire
   - Moya/Core (15.0.0):
     - Alamofire (~> 5.0)
     - SnapKit (5.6.0)
