@@ -1,0 +1,22 @@
+types:
+  - base
+  - feature
+  - tests: .*Tests?
+  - io: IO
+bans:
+  - feature: feature
+    severity: error
+  - base: feature
+    severity: error
+  - base: base
+    severity: warning
+modules:
+  remote:
+    Alamofire: base
+    Kingfisher: base
+    Moya/Core: base
+    SnapKit: base
+  local:
+    LocalPod: feature
+    LocalPod/Tests: tests
+    LocalPodIO: io
