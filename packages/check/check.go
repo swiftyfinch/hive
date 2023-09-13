@@ -40,7 +40,18 @@ func Check(configPath string) error {
 }
 
 func formatMessage(failure validationFailure) string {
-	moduleName, moduleType := failure.ModuleName, failure.ModuleType
-	dependencyName, dependencyType := failure.DependencyName, failure.DependencyType
-	return fmt.Sprintf("forbidden dependency %s(%s) → %s(%s)", moduleName, moduleType, dependencyName, dependencyType)
+	var severity string
+	if failure.IsWarning {
+		severity = "warning"
+	} else {
+		severity = "error"
+	}
+	return fmt.Sprintf(
+		"[%s] %s(%s) → %s(%s)",
+		severity,
+		failure.ModuleName,
+		failure.ModuleType,
+		failure.DependencyName,
+		failure.DependencyType,
+	)
 }
