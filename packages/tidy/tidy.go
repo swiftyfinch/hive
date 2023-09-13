@@ -17,15 +17,15 @@ func Tidy(configPath string) error {
 		return err
 	}
 
-	// Read pods from Podfile.lock
-	remotePods, localPods, err := cocoapods.ReadPods()
+	// Read modules from Podfile.lock
+	remoteModules, localModules, err := cocoapods.ReadPods()
 	if err != nil {
 		return err
 	}
 
 	// Merge modules from Podfile.lock and config
-	updateModules(remotePods, &config.Modules.Remote)
-	updateModules(localPods, &config.Modules.Local)
+	updateModules(remoteModules, &config.Modules.Remote)
+	updateModules(localModules, &config.Modules.Local)
 
 	// Save updated config
 	return writeConfig(*config, configPath)
@@ -50,17 +50,17 @@ func readConfig(path string) (*config.Config, error) {
 }
 
 func updateModules(
-	pods map[string]common.Module,
-	modules *map[string]*string,
+	modules map[string]common.Module,
+	configModules *map[string]*string,
 ) {
-	for module := range *modules {
-		if _, ok := pods[module]; !ok {
-			delete(*modules, module)
+	for module := range *configModules {
+		if _, ok := modules[module]; !ok {
+			delete(*configModules, module)
 		}
 	}
-	for _, pod := range pods {
-		if _, ok := (*modules)[pod.Name]; !ok {
-			(*modules)[pod.Name] = nil
+	for _, module := range modules {
+		if _, ok := (*configModules)[module.Name]; !ok {
+			(*configModules)[module.Name] = nil
 		}
 	}
 }
