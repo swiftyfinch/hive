@@ -10,9 +10,34 @@ type Modules struct {
 }
 
 type Config struct {
-	Types   []string            `yaml:"types"`
+	Types   []interface{}       `yaml:"types"`
 	Bans    []map[string]string `yaml:"bans"`
 	Modules Modules             `yaml:"modules"`
+}
+
+func TypeValue(theType interface{}) *string {
+	switch resolvedType := theType.(type) {
+	case string:
+		return &resolvedType
+	case map[string]interface{}:
+		for key := range resolvedType {
+			return &key
+		}
+	}
+	return nil
+}
+func TypeRegex(theType interface{}) *string {
+	switch resolvedType := theType.(type) {
+	case string:
+		return nil
+	case map[string]interface{}:
+		for _, value := range resolvedType {
+			if stringValue, ok := value.(string); ok {
+				return &stringValue
+			}
+		}
+	}
+	return nil
 }
 
 func (config Config) AllModulesTypes() (map[string]string, error) {

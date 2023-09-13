@@ -33,8 +33,13 @@ func Tidy(configPath string) error {
 
 func readConfig(path string) (*config.Config, error) {
 	if _, err := os.Stat(path); os.IsNotExist(err) {
+		types := []interface{}{}
+		for _, value := range []string{"base", "feature"} {
+			types = append(types, value)
+		}
+
 		return &config.Config{
-			Types: []string{"base", "feature"},
+			Types: types,
 			Bans: []map[string]string{
 				{"feature": "feature", "severity": "error"},
 				{"base": "feature", "severity": "error"},
