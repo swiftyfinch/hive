@@ -5,11 +5,12 @@ types:
   - io: IO
 bans:
   - feature: feature
-    severity: error
   - base: feature
-    severity: error
   - base: base
     severity: warning
+  - severity: warning
+    tests: feature
+  - io: base
 modules:
   remote:
     Alamofire: base

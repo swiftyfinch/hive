@@ -11,7 +11,8 @@ PODS:
     - Alamofire (~> 5.0)
     - SnapKit (5.6.0)
   - SnapKit (5.6.0)
-  - LocalPodIO
+  - LocalPodIO:
+    - Kingfisher (7.4.1)
 
 SPEC REPOS:
   trunk:
