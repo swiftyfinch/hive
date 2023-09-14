@@ -1,6 +1,6 @@
 # Hive 🐝
 
-It's a prototype of a system to verify dependencies level.<br>
+It's the prototype of the system to verify dependencies level.<br>
 I used this as a playground during my self-education in the Go language.
 
 Right now, it can parse only the Podfile.lock file.<br>
