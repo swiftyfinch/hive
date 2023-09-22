@@ -1,4 +1,4 @@
-package common
+package modules
 
 type Module struct {
 	Name         string

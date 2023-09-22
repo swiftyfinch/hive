@@ -2,7 +2,7 @@ package check
 
 import (
 	"fmt"
-	"hive/packages/common"
+	"main/internal/modules"
 )
 
 type validationFailure struct {
@@ -14,7 +14,7 @@ type validationFailure struct {
 }
 
 func checkDependencies(
-	modules map[string]common.Module,
+	modules map[string]modules.Module,
 	bans []map[string]string,
 	moduleTypes map[string]string,
 ) ([]validationFailure, error) {
@@ -34,7 +34,7 @@ func checkDependencies(
 }
 
 func checkModuleDependencies(
-	module common.Module,
+	module modules.Module,
 	bans []map[string]string,
 	moduleTypes map[string]string,
 ) ([]validationFailure, error) {

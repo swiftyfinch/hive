@@ -2,8 +2,8 @@ package check
 
 import (
 	"fmt"
-	"hive/packages/cocoapods"
-	"hive/packages/config"
+	"main/internal/cocoapods"
+	"main/internal/config"
 )
 
 func Check(configPath string) error {

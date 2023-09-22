@@ -3,13 +3,13 @@ package main
 import (
 	"flag"
 	"fmt"
-	"hive/packages/check"
-	"hive/packages/tidy"
 	"log"
+	"main/internal/commands/check"
+	"main/internal/commands/tidy"
 	"os"
 )
 
-const configPath = ".devtools/hive.yml"
+const Config_Path = ".devtools/hive.yml"
 
 func main() {
 	if len(os.Args) < 2 {
@@ -21,13 +21,13 @@ func main() {
 	case "check":
 		checkFlagSet := flag.NewFlagSet("check", flag.ExitOnError)
 		checkFlagSet.Parse(os.Args[2:])
-		if err := check.Check(configPath); err != nil {
+		if err := check.Check(Config_Path); err != nil {
 			log.Fatal(err)
 		}
 	case "tidy":
 		tidyFlagSet := flag.NewFlagSet("tidy", flag.ExitOnError)
 		tidyFlagSet.Parse(os.Args[2:])
-		if err := tidy.Tidy(configPath); err != nil {
+		if err := tidy.Tidy(Config_Path); err != nil {
 			log.Fatal(err)
 		}
 	default:

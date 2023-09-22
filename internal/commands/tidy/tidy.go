@@ -1,9 +1,9 @@
 package tidy
 
 import (
-	"hive/packages/cocoapods"
-	"hive/packages/common"
-	"hive/packages/config"
+	"main/internal/cocoapods"
+	"main/internal/config"
+	"main/internal/modules"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -56,7 +56,7 @@ func readConfig(path string) (*config.Config, error) {
 }
 
 func updateModules(
-	modules map[string]common.Module,
+	modules map[string]modules.Module,
 	configModules *map[string]*string,
 	types []interface{},
 ) error {
