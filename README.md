@@ -36,11 +36,28 @@ map[string][]string{
 ## Tidy
 
 Call `tidy` to collect modules and dependencies in the first time.<br>
+And then call it to sync config with the current modules.
 ```sh
 > hive tidy
 ```
 
-It will create a config file which you should fill with module types. For example:
+It will create a config file with all modules. For example:
+```yml
+modules:
+  remote:
+    Alamofire: null
+    Kingfisher: null
+    Moya/Core: null
+    SnapKit: null
+  local:
+    LocalPod: null
+    LocalPod/Tests: tests
+    LocalPodIO: api
+    LocalPodMock: mock
+    LocalPodsExample: app
+```
+
+And then fill missing types:
 ```yml
 modules:
   remote:
