@@ -3,18 +3,18 @@ package tidy
 import (
 	"main/internal/cocoapods"
 	"main/internal/config"
-	"main/internal/modules"
+	"main/internal/core"
 	"os"
 	"path/filepath"
-	"regexp"
 )
 
 func Tidy(configPath string) error {
-	config, err := readConfig(configPath)
+	config, err := getConfig(configPath)
 	if err != nil {
 		return err
 	}
-	if err := config.Validate(); err != nil {
+	types := core.DefaultTypes()
+	if err := config.Validate(types); err != nil {
 		return err
 	}
 
@@ -25,27 +25,16 @@ func Tidy(configPath string) error {
 	}
 
 	// Merge modules from Podfile.lock and config
-	updateModules(remoteModules, &config.Modules.Remote, config.Types)
-	updateModules(localModules, &config.Modules.Local, config.Types)
+	updateModules(remoteModules, &config.Modules.Remote, types)
+	updateModules(localModules, &config.Modules.Local, types)
 
 	// Save updated config
 	return writeConfig(*config, configPath)
 }
 
-func readConfig(path string) (*config.Config, error) {
+func getConfig(path string) (*config.Config, error) {
 	if _, err := os.Stat(path); os.IsNotExist(err) {
-		types := []interface{}{}
-		for _, value := range []string{"base", "feature"} {
-			types = append(types, value)
-		}
-
 		return &config.Config{
-			Types: types,
-			Bans: []map[string]string{
-				{"feature": "feature", "severity": "error"},
-				{"base": "feature", "severity": "error"},
-				{"base": "base", "severity": "warning"},
-			},
 			Modules: config.Modules{
 				Remote: map[string]*string{},
 				Local:  map[string]*string{},
@@ -56,10 +45,11 @@ func readConfig(path string) (*config.Config, error) {
 }
 
 func updateModules(
-	modules map[string]modules.Module,
+	modules map[string]core.Module,
 	configModules *map[string]*string,
-	types []interface{},
+	types map[string]core.Type,
 ) error {
+	// Remove redundant modules
 	for module := range *configModules {
 		if _, ok := modules[module]; !ok {
 			delete(*configModules, module)
@@ -67,20 +57,23 @@ func updateModules(
 	}
 
 	for _, module := range modules {
-		for _, element := range types {
-			if regex := config.TypeRegex(element); regex != nil {
-				regex, err := regexp.Compile(*regex)
-				if err != nil {
-					return err
-				}
-				if regex.MatchString(module.Name) {
-					(*configModules)[module.Name] = config.TypeValue(element)
+		match := false
+		for _, moduleType := range types {
+			// Try to find out what type of module is it
+			for _, regexp := range moduleType.Regexps {
+				if regexp.MatchString(module.Name) {
+					(*configModules)[module.Name] = &moduleType.Name
+					match = true
 					break
 				}
 			}
+			if match {
+				break
+			}
 		}
 
-		if _, ok := (*configModules)[module.Name]; !ok {
+		if _, ok := (*configModules)[module.Name]; !ok && !match {
+			// Add new module with null type
 			(*configModules)[module.Name] = nil
 		}
 	}

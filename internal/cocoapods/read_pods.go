@@ -2,13 +2,13 @@ package cocoapods
 
 import (
 	"fmt"
-	"main/internal/modules"
+	"main/internal/core"
 	glob "main/internal/path"
 )
 
 func ReadPods() (
-	remotePods map[string]modules.Module,
-	localPods map[string]modules.Module,
+	remotePods map[string]core.Module,
+	localPods map[string]core.Module,
 	err error,
 ) {
 	paths, err := glob.FindPathsRecursively(".", "Podfile.lock")

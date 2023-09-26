@@ -1,16 +1,3 @@
-types:
-  - base
-  - feature
-  - tests: .*Tests?
-  - io: IO
-bans:
-  - feature: feature
-  - base: feature
-  - base: base
-    severity: warning
-  - severity: warning
-    tests: feature
-  - io: base
 modules:
   remote:
     Alamofire: base
@@ -20,4 +7,6 @@ modules:
   local:
     LocalPod: feature
     LocalPod/Tests: tests
-    LocalPodIO: io
+    LocalPodIO: api
+    LocalPodMock: mock
+    LocalPodsExample: app

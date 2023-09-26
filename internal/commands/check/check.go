@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"main/internal/cocoapods"
 	"main/internal/config"
+	"main/internal/core"
 )
 
 func Check(configPath string) error {
@@ -11,7 +12,8 @@ func Check(configPath string) error {
 	if err != nil {
 		return err
 	}
-	if err := config.Validate(); err != nil {
+	types := core.DefaultTypes()
+	if err := config.Validate(types); err != nil {
 		return err
 	}
 
@@ -28,7 +30,8 @@ func Check(configPath string) error {
 	}
 
 	// Check
-	failures, err := checkDependencies(localPods, config.Bans, moduleTypes)
+	rules := core.DependencyRules()
+	failures, err := checkDependencies(localPods, rules, moduleTypes)
 	if err != nil {
 		return err
 	}
@@ -40,15 +43,8 @@ func Check(configPath string) error {
 }
 
 func formatMessage(failure validationFailure) string {
-	var severity string
-	if failure.IsWarning {
-		severity = "warning"
-	} else {
-		severity = "error"
-	}
 	return fmt.Sprintf(
-		"[%s] %s(%s) → %s(%s)",
-		severity,
+		"[error] %s(%s) → %s(%s)",
 		failure.ModuleName,
 		failure.ModuleType,
 		failure.DependencyName,

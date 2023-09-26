@@ -2,7 +2,8 @@ package check
 
 import (
 	"fmt"
-	"main/internal/modules"
+	"main/internal/core"
+	"slices"
 )
 
 type validationFailure struct {
@@ -10,19 +11,18 @@ type validationFailure struct {
 	ModuleType     string
 	DependencyName string
 	DependencyType string
-	IsWarning      bool
 }
 
 func checkDependencies(
-	modules map[string]modules.Module,
-	bans []map[string]string,
+	modules map[string]core.Module,
+	rules map[string][]string,
 	moduleTypes map[string]string,
 ) ([]validationFailure, error) {
 	failures := []validationFailure{}
 	for _, module := range modules {
 		moduleFailures, err := checkModuleDependencies(
 			module,
-			bans,
+			rules,
 			moduleTypes,
 		)
 		if err != nil {
@@ -34,8 +34,8 @@ func checkDependencies(
 }
 
 func checkModuleDependencies(
-	module modules.Module,
-	bans []map[string]string,
+	module core.Module,
+	rules map[string][]string,
 	moduleTypes map[string]string,
 ) ([]validationFailure, error) {
 	failures := []validationFailure{}
@@ -48,16 +48,19 @@ func checkModuleDependencies(
 		if !ok {
 			return nil, fmt.Errorf("can't find type of module '%s'", dependency)
 		}
-		for _, rule := range bans {
-			if banDependency, ok := rule[moduleType]; ok && banDependency == dependencyType {
-				severity, ok := rule["severity"]
-				isWarning := ok && severity == "warning"
-				failures = append(failures, validationFailure{
-					module.Name, moduleType,
-					dependency, dependencyType,
-					isWarning,
-				})
-			}
+
+		allowDependencies, ok := rules[moduleType]
+		if !ok {
+			return nil, fmt.Errorf("unknown module type '%s'", moduleType)
+		}
+
+		if ok && slices.Contains(allowDependencies, dependencyType) {
+			// Correct dependency
+		} else {
+			failures = append(failures, validationFailure{
+				module.Name, moduleType,
+				dependency, dependencyType,
+			})
 		}
 	}
 	return failures, nil
