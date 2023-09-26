@@ -44,10 +44,10 @@ func Check(configPath string) error {
 
 func formatMessage(failure validationFailure) string {
 	return fmt.Sprintf(
-		"[error] %s(%s) → %s(%s)",
-		failure.ModuleName,
+		"⛔️[%s: %s] %s → %s",
 		failure.ModuleType,
-		failure.DependencyName,
 		failure.DependencyType,
+		failure.ModuleName,
+		failure.DependencyName,
 	)
 }
