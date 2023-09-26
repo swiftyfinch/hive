@@ -4,9 +4,13 @@ It's the prototype of the system to verify dependencies level.<br>
 I used this as a playground during my self-education in the Go language.
 
 Right now, it can parse only the Podfile.lock file.<br>
-There are two subcommands: `tidy` and `check`.
 
-## Module Types
+
+## Details
+
+There is an internal declaration of module types and dependency rules.
+
+### Module Types
 
 ```go
 // Can use any regexp for different platforms
@@ -20,7 +24,7 @@ map[string][]string{
 }
 ```
 
-## Dependency Rules
+### Dependency Rules
 
 ```go
 map[string][]string{
@@ -33,7 +37,29 @@ map[string][]string{
 }
 ```
 
-## Tidy
+```mermaid
+flowchart LR
+    tests --> app
+    tests ---> feature
+    tests ---> base
+    tests ---> mock
+    tests ---> api
+    app ---> api
+    app ---> feature
+    app ---> base
+    app ---> mock
+    feature ---> base
+    feature ---> api
+    mock ---> base
+    mock ---> api
+    base --> base2[base]
+```
+
+## Commands
+
+There are two subcommands: `tidy` and `check`.
+
+### Tidy
 
 Call `tidy` to collect modules and dependencies in the first time.<br>
 And then call it to sync config with the current modules.
@@ -76,7 +102,7 @@ modules:
 And use this command after each change of modules/dependencies/config.<br>
 It will remove old modules and add new ones.
 
-## Check
+### Check
 
 The `check` subcommand verifies local module dependencies based on default rules.
 ```sh
