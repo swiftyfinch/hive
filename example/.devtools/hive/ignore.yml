@@ -1,0 +1,3 @@
+# Ignore module and dependency name combination by RegExp
+- LocalPodIO: Kingfisher # It's for test
+- .*: AnotherOneIO # It's too

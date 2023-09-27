@@ -14,7 +14,7 @@ func DefaultTypes() map[string]Type {
 		"app":     {".*Example$"},
 		"mock":    {".*Mock$"},
 		"feature": {},
-		"base":  {},
+		"base":    {},
 		"api":     {".*IO$", ".*Interfaces$"},
 	}
 

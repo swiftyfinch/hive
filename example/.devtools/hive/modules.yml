@@ -5,6 +5,7 @@ modules:
     Moya/Core: base
     SnapKit: base
   local:
+    AnotherOneIO: api
     LocalPod: feature
     LocalPod/Tests: tests
     LocalPodIO: api

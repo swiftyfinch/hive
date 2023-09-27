@@ -9,7 +9,7 @@ import (
 	"os"
 )
 
-const Config_Path = ".devtools/hive.yml"
+const Config_Path = ".devtools/hive"
 
 func main() {
 	if len(os.Args) < 2 {

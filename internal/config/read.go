@@ -16,5 +16,11 @@ func Read(path string) (*Config, error) {
 	if err = yaml.Unmarshal(buffer, config); err != nil {
 		return nil, err
 	}
+	if config.Modules.Local == nil {
+		config.Modules.Local = map[string]*string{}
+	}
+	if config.Modules.Remote == nil {
+		config.Modules.Remote = map[string]*string{}
+	}
 	return config, err
 }

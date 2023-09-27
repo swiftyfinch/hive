@@ -5,15 +5,23 @@ import (
 	"main/internal/cocoapods"
 	"main/internal/config"
 	"main/internal/core"
+	"os"
 )
 
-func Check(configPath string) error {
+func Check(workingDirectory string) error {
+	configPath := workingDirectory + "/" + core.Modules_File_Name
 	config, err := config.Read(configPath)
 	if err != nil {
 		return err
 	}
+
 	types := core.DefaultTypes()
 	if err := config.Validate(types); err != nil {
+		return err
+	}
+
+	ignore, err := readIgnore(workingDirectory + "/ignore.yml")
+	if err != nil {
 		return err
 	}
 
@@ -31,7 +39,8 @@ func Check(configPath string) error {
 
 	// Check
 	rules := core.DependencyRules()
-	failures, err := checkDependencies(localPods, rules, moduleTypes)
+
+	failures, err := checkDependencies(localPods, rules, moduleTypes, ignore)
 	if err != nil {
 		return err
 	}
@@ -42,9 +51,16 @@ func Check(configPath string) error {
 	return nil
 }
 
+func readIgnore(path string) ([]config.Ignore, error) {
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		return []config.Ignore{}, nil
+	}
+	return config.ReadIgnore(path)
+}
+
 func formatMessage(failure validationFailure) string {
 	return fmt.Sprintf(
-		"⛔️[%s: %s] %s → %s",
+		"⛔️ [%s: %s] %s → %s",
 		failure.ModuleType,
 		failure.DependencyType,
 		failure.ModuleName,

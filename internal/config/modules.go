@@ -1,8 +1,8 @@
 package config
 
-import "fmt"
-
-type ModulesMap map[string]*string
+import (
+	"fmt"
+)
 
 type Modules struct {
 	Remote map[string]*string `yaml:"remote"`

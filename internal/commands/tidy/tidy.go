@@ -8,11 +8,13 @@ import (
 	"path/filepath"
 )
 
-func Tidy(configPath string) error {
+func Tidy(workingDirectory string) error {
+	configPath := workingDirectory + "/" + core.Modules_File_Name
 	config, err := getConfig(configPath)
 	if err != nil {
 		return err
 	}
+
 	types := core.DefaultTypes()
 	if err := config.Validate(types); err != nil {
 		return err
