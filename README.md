@@ -4,7 +4,7 @@ It's the prototype of the system to verify dependencies level.<br>
 I used this as a playground during my self-education in the Go language.
 
 Right now, it can parse only the Podfile.lock file.<br>
-
+<br>
 
 ## Details
 
@@ -41,18 +41,39 @@ map[string][]string{
 flowchart LR
     tests --> app
     tests ---> feature
-    tests ---> base
     tests ---> mock
+    tests ---> base
     tests ---> api
-    app ---> api
     app ---> feature
-    app ---> base
     app ---> mock
+    app ---> base
+    app ---> api
     feature ---> base
     feature ---> api
     mock ---> base
     mock ---> api
     base --> base2[base]
+    base ---> api
+```
+
+### Ignore
+
+```yml
+# Ignore module and dependency name combination by RegExp
+- LocalPodIO: Kingfisher # It's for test
+- .*: AnotherOneIO # It's too
+```
+<br>
+
+## File Structure
+
+```
+.
+├─ .devtools (Namespace)
+│   └─ hive
+│      ├─ modules.yml
+│      └─ ignore.yml (optional)
+└─ Podfile.lock
 ```
 
 ## Commands
@@ -83,7 +104,7 @@ modules:
     LocalPodsExample: app
 ```
 
-And then fill missing types:
+And then fill missing types manually:
 ```yml
 modules:
   remote:
