@@ -120,6 +120,21 @@ modules:
     LocalPodsExample: app
 ```
 
+<hr>
+
+Or you can pass a path to registy with remote module types:
+```sh
+> hive tidy ~/Developer/Git/hive/remote/registry.yml
+```
+
+These types will be applied to remote modules in the modules.yml:
+```yml
+Alamofire: base
+Kingfisher: base
+Moya/Core: base
+SnapKit: base
+```
+
 And use this command after each change of modules/dependencies/config.<br>
 It will remove old modules and add new ones.
 
