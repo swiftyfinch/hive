@@ -1,6 +1,7 @@
 package tidy
 
 import (
+	"fmt"
 	"main/internal/cocoapods"
 	"main/internal/config"
 	"main/internal/core"
@@ -8,15 +9,15 @@ import (
 	"path/filepath"
 )
 
-func Tidy(workingDirectory string) error {
+func Tidy(workingDirectory string, registryPath *string) error {
 	modulesPath := workingDirectory + "/" + core.Modules_File_Name
-	modules, err := getModules(modulesPath)
+	cachedModules, err := getModules(modulesPath)
 	if err != nil {
 		return err
 	}
 
 	types := core.DefaultTypes()
-	if err := modules.Validate(types); err != nil {
+	if err := cachedModules.Validate(types); err != nil {
 		return err
 	}
 
@@ -27,11 +28,21 @@ func Tidy(workingDirectory string) error {
 	}
 
 	// Merge modules from Podfile.lock and config
-	updateModules(remoteModules, &modules.Remote, types)
-	updateModules(localModules, &modules.Local, types)
+	updateModules(remoteModules, &cachedModules.Remote, types)
+	updateModules(localModules, &cachedModules.Local, types)
+
+	// Override cached modules from registy
+	if registryPath != nil {
+		registyModules, err := config.ReadRegistry(*registryPath)
+		fmt.Println(registyModules)
+		if err != nil {
+			return err
+		}
+		updateRemoteModules(&cachedModules.Remote, registyModules)
+	}
 
 	// Save updated config
-	return writeModules(*modules, modulesPath)
+	return writeModules(*cachedModules, modulesPath)
 }
 
 func getModules(path string) (*config.Modules, error) {
@@ -44,15 +55,26 @@ func getModules(path string) (*config.Modules, error) {
 	return config.ReadModules(path)
 }
 
+func updateRemoteModules(
+	cachedModules *map[string]*string,
+	registyModules map[string]string,
+) {
+	for name := range *cachedModules {
+		if moduleType, ok := registyModules[name]; ok {
+			(*cachedModules)[name] = &moduleType
+		}
+	}
+}
+
 func updateModules(
 	modules map[string]core.Module,
-	configModules *map[string]*string,
+	cachedModules *map[string]*string,
 	types map[string]core.Type,
 ) error {
 	// Remove redundant modules
-	for module := range *configModules {
+	for module := range *cachedModules {
 		if _, ok := modules[module]; !ok {
-			delete(*configModules, module)
+			delete(*cachedModules, module)
 		}
 	}
 
@@ -62,7 +84,7 @@ func updateModules(
 			// Try to find out what type of module is it
 			for _, regexp := range moduleType.Regexps {
 				if regexp.MatchString(module.Name) {
-					(*configModules)[module.Name] = &moduleType.Name
+					(*cachedModules)[module.Name] = &moduleType.Name
 					match = true
 					break
 				}
@@ -72,9 +94,9 @@ func updateModules(
 			}
 		}
 
-		if _, ok := (*configModules)[module.Name]; !ok && !match {
+		if _, ok := (*cachedModules)[module.Name]; !ok && !match {
 			// Add new module with null type
-			(*configModules)[module.Name] = nil
+			(*cachedModules)[module.Name] = nil
 		}
 	}
 	return nil

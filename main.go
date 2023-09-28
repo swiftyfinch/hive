@@ -13,8 +13,7 @@ const Config_Path = ".devtools/hive"
 
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Println("missing subcommand")
-		os.Exit(1)
+		log.Fatal("missing subcommand")
 	}
 
 	switch os.Args[1] {
@@ -27,7 +26,12 @@ func main() {
 	case "tidy":
 		tidyFlagSet := flag.NewFlagSet("tidy", flag.ExitOnError)
 		tidyFlagSet.Parse(os.Args[2:])
-		if err := tidy.Tidy(Config_Path); err != nil {
+
+		var registryPath *string
+		if len(os.Args) > 2 {
+			registryPath = &os.Args[2]
+		}
+		if err := tidy.Tidy(Config_Path, registryPath); err != nil {
 			log.Fatal(err)
 		}
 	default:

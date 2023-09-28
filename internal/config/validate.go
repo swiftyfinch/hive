@@ -15,7 +15,7 @@ func (modules Modules) Validate(types map[string]core.Type) error {
 func validateModules(modules map[string]*string, types map[string]core.Type) error {
 	for key, value := range modules {
 		if value == nil {
-			return fmt.Errorf("nil type in module '%s'", key)
+			continue
 		}
 		if _, ok := types[*value]; !ok {
 			return fmt.Errorf("incorrect type '%s' in module '%s'", *value, key)
