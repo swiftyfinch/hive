@@ -1,13 +1,12 @@
-modules:
-  remote:
-    Alamofire: base
-    Kingfisher: base
-    Moya/Core: base
-    SnapKit: base
-  local:
-    AnotherOneIO: api
-    LocalPod: feature
-    LocalPod/Tests: tests
-    LocalPodIO: api
-    LocalPodMock: mock
-    LocalPodsExample: app
+remote:
+  Alamofire: base
+  Kingfisher: base
+  Moya/Core: base
+  SnapKit: base
+local:
+  AnotherOneIO: api
+  LocalPod: feature
+  LocalPod/Tests: tests
+  LocalPodIO: api
+  LocalPodMock: mock
+  LocalPodsExample: app

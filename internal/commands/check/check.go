@@ -8,19 +8,21 @@ import (
 	"os"
 )
 
+const Ignore_File_Name = "ignore.yml"
+
 func Check(workingDirectory string) error {
-	configPath := workingDirectory + "/" + core.Modules_File_Name
-	config, err := config.Read(configPath)
+	modulesPath := workingDirectory + "/" + core.Modules_File_Name
+	modules, err := config.ReadModules(modulesPath)
 	if err != nil {
 		return err
 	}
 
 	types := core.DefaultTypes()
-	if err := config.Validate(types); err != nil {
+	if err := modules.Validate(types); err != nil {
 		return err
 	}
 
-	ignore, err := readIgnore(workingDirectory + "/ignore.yml")
+	ignore, err := readIgnore(workingDirectory + "/" + Ignore_File_Name)
 	if err != nil {
 		return err
 	}
@@ -31,15 +33,14 @@ func Check(workingDirectory string) error {
 		return err
 	}
 
-	// Merge modules from config
-	moduleTypes, err := config.AllModulesTypes()
+	// Get module types
+	moduleTypes, err := modules.Types()
 	if err != nil {
 		return err
 	}
 
 	// Check
 	rules := core.DependencyRules()
-
 	failures, err := checkDependencies(localPods, rules, moduleTypes, ignore)
 	if err != nil {
 		return err

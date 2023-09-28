@@ -5,15 +5,11 @@ import (
 	"main/internal/core"
 )
 
-func (config Config) Validate(types map[string]core.Type) error {
-	return config.validateModules(types)
-}
-
-func (config Config) validateModules(types map[string]core.Type) error {
-	if err := validateModules(config.Modules.Remote, types); err != nil {
+func (modules Modules) Validate(types map[string]core.Type) error {
+	if err := validateModules(modules.Remote, types); err != nil {
 		return err
 	}
-	return validateModules(config.Modules.Local, types)
+	return validateModules(modules.Local, types)
 }
 
 func validateModules(modules map[string]*string, types map[string]core.Type) error {
